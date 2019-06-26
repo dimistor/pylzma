@@ -103,6 +103,7 @@ else:
     ARRAY_TYPE_UINT32 = 'I'
 
 READ_BLOCKSIZE                   = 16384
+BUFFER_BLOCKSIZE                 = 128*1024
 
 MAGIC_7Z                         = unhexlify('377abcaf271c')  # '7z\xbc\xaf\x27\x1c'
 
@@ -689,13 +690,9 @@ class ArchiveFile(Base):
                 self._file.seek(pos)
             else:
                 self._file.seek(self._src_start)
-            checkremaining = is_last_coder and not self._folder.solid and can_partial_decompress
             while remaining > 0:
                 data = self._file.read(READ_BLOCKSIZE)
-                if checkremaining or (with_cache and len(data) < READ_BLOCKSIZE):
-                    tmp = decompressor.decompress(data, remaining)
-                else:
-                    tmp = decompressor.decompress(data)
+                tmp = decompressor.decompress(data, min(remaining, BUFFER_BLOCKSIZE))
                 if not tmp and not data:
                     raise DecompressionError('end of stream while decompressing')
                 out.write(tmp)

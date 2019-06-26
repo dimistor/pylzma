@@ -342,6 +342,11 @@ class Test7ZipFiles(unittest.TestCase):
         # test loading file submitted by @miurahr
         self._test_archive('github_60.7z')
 
+    def test_lzma1900(self):
+        fp = self._open_file(os.path.join(ROOT, 'data', 'lzma1900.7z'), 'rb')
+        archive = Archive7z(fp)
+        self._test_decode_all(archive)
+
 def suite():
     suite = unittest.TestSuite()
 
